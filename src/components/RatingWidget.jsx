@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import client from '../api/client';
 import { Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function RatingWidget({ imageId, initialAvg, initialCount }) {
   const [avg, setAvg] = useState(initialAvg || 0);
@@ -9,9 +10,10 @@ export default function RatingWidget({ imageId, initialAvg, initialCount }) {
   const [hover, setHover] = useState(0);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleRate = async (score) => {
-    if (!user) return alert('Please login to rate');
+    if (!user) return navigate('/login');
     
     setLoading(true);
     try {
@@ -26,39 +28,36 @@ export default function RatingWidget({ imageId, initialAvg, initialCount }) {
   };
 
   return (
-    <div style={{display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem 1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', display: 'inline-flex'}}>
-      <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', paddingRight: '1rem', borderRight: '1px solid var(--glass-border)'}}>
-        <span style={{fontSize: '1.5rem', fontWeight: 700}}>{Number(avg).toFixed(1)}</span>
-        <div style={{display: 'flex', flexDirection: 'column', fontSize: '0.75rem', color: 'var(--text-secondary)'}}>
-          <Star size={12} fill="var(--accent-color)" color="var(--accent-color)" />
-          <span>{count} votes</span>
-        </div>
-      </div>
-      
-      <div style={{display: 'flex', gap: '0.25rem'}} onMouseLeave={() => setHover(0)}>
-        {[1,2,3,4,5].map(star => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+      <div style={{ display: 'flex', gap: '2px' }} onMouseLeave={() => setHover(0)}>
+        {[1, 2, 3, 4, 5].map(star => (
           <button 
             key={star}
-            disabled={loading || !user}
+            disabled={loading}
             onMouseEnter={() => setHover(star)}
             onClick={() => handleRate(star)}
             style={{
               background: 'transparent', 
               border: 'none', 
-              cursor: user ? 'pointer' : 'not-allowed',
+              cursor: 'pointer',
+              padding: '2px',
               transition: 'transform 0.1s'
             }}
           >
             <Star 
-              size={24} 
-              fill={star <= (hover || Math.round(Number(avg))) ? "var(--accent-color)" : "transparent"} 
-              color={star <= (hover || Math.round(Number(avg))) ? "var(--accent-color)" : "var(--text-secondary)"} 
-              style={{transform: star === hover ? 'scale(1.2)' : 'none'}}
+              size={20} 
+              fill={star <= (hover || Math.round(Number(avg))) ? "var(--star-gold)" : "none"} 
+              color={star <= (hover || Math.round(Number(avg))) ? "var(--star-gold)" : "var(--border-subtle)"} 
+              style={{ transform: star === hover ? 'scale(1.15)' : 'none' }}
             />
           </button>
         ))}
       </div>
-      {!user && <span style={{fontSize: '0.75rem', color: 'var(--text-secondary)'}}>Login to rate</span>}
+      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+        <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{Number(avg).toFixed(1)}</span>
+        <span style={{ margin: '0 4px' }}>•</span>
+        <span>{count} ratings</span>
+      </div>
     </div>
   );
 }

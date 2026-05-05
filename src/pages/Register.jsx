@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Camera } from 'lucide-react';
+import { Camera, Loader2, User, Aperture } from 'lucide-react';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -11,15 +11,15 @@ export default function Register() {
     password_confirmation: '',
     role: 'consumer'
   });
-  const [error, setError] = useState('');
+  const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
-  const navigate = useNavigate();
+  const { register }          = useAuth();
+  const navigate              = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(formData.password !== formData.password_confirmation) {
-      return setError('Passwords do not match');
+    if (formData.password !== formData.password_confirmation) {
+      return setError('Passwords do not match. Please check and try again.');
     }
     try {
       setError('');
@@ -27,58 +27,176 @@ export default function Register() {
       await register(formData);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.errors?.email?.[0] || 'Registration failed');
+      setError(
+        err.response?.data?.message ||
+        err.response?.data?.errors?.email?.[0] ||
+        'Registration failed. Please check your details and try again.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleChange = (e) => {
-    setFormData({...formData, [e.target.name]: e.target.value});
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
-    <div className="glass-panel" style={{maxWidth: '450px', margin: '4rem auto', padding: '2rem'}}>
-      <div style={{textAlign: 'center', marginBottom: '2rem'}}>
-        <Camera size={48} color="var(--accent-color)" />
-        <h2 style={{marginTop: '1rem'}}>Join Pixora</h2>
-      </div>
-      
-      {error && <div style={{color: 'var(--danger-color)', marginBottom: '1rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.75rem', borderRadius: '8px'}}>{error}</div>}
-      
-      <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-        <div>
-          <label style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem'}}>Name</label>
-          <input name="name" type="text" className="glass-input" value={formData.name} onChange={handleChange} required />
-        </div>
-        <div>
-          <label style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem'}}>Email</label>
-          <input name="email" type="email" className="glass-input" value={formData.email} onChange={handleChange} required />
-        </div>
-        <div>
-          <label style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem'}}>Role</label>
-          <select name="role" className="glass-input" value={formData.role} onChange={handleChange} required style={{backgroundColor: '#1e293b'}}>
-            <option value="consumer">Consumer (Browse & Rate)</option>
-            <option value="creator">Creator (Upload & Manage)</option>
-          </select>
-        </div>
-        <div style={{display: 'flex', gap: '1rem'}}>
-          <div style={{flex: 1}}>
-            <label style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem'}}>Password</label>
-            <input name="password" type="password" className="glass-input" value={formData.password} onChange={handleChange} required />
+    <div className="auth-page">
+      <div className="auth-card animate-fade-in" style={{ maxWidth: '480px' }}>
+
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 56,
+            height: 56,
+            background: 'var(--accent)',
+            borderRadius: '16px',
+            marginBottom: '1.25rem'
+          }}>
+            <Camera size={28} color="white" />
           </div>
-          <div style={{flex: 1}}>
-            <label style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem'}}>Confirm</label>
-            <input name="password_confirmation" type="password" className="glass-input" value={formData.password_confirmation} onChange={handleChange} required />
-          </div>
+          <h1 style={{ fontSize: '1.625rem', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-main)', marginBottom: '0.375rem' }}>
+            Join Pixora
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem' }}>
+            Create your account and start sharing
+          </p>
         </div>
-        
-        <button type="submit" className="glass-button" disabled={loading} style={{marginTop: '1rem', width: '100%'}}>
-          {loading ? 'Registering...' : 'Create Account'}
-        </button>
-      </form>
-      <div style={{marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem'}}>
-        Already registered? <Link to="/login" style={{color: 'var(--accent-color)', textDecoration: 'none'}}>Login</Link>
+
+        {/* Error */}
+        {error && <div className="alert alert-error" style={{ marginBottom: '1.5rem' }}>{error}</div>}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="reg-name">Full Name</label>
+            <input
+              id="reg-name"
+              name="name"
+              type="text"
+              className="input"
+              placeholder="Jane Smith"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              autoComplete="name"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="reg-email">Email Address</label>
+            <input
+              id="reg-email"
+              name="email"
+              type="email"
+              className="input"
+              placeholder="you@example.com"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              autoComplete="email"
+            />
+          </div>
+
+          {/* Role Selector */}
+          <div className="form-group">
+            <label className="form-label">Account Type</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              {[
+                { value: 'consumer', label: 'Explorer', sub: 'Browse & rate photos' },
+                { value: 'creator',  label: 'Creator',  sub: 'Upload & manage photos' }
+              ].map(({ value, label, sub }) => (
+                <label
+                  key={value}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    padding: '0.875rem 1rem',
+                    borderRadius: '10px',
+                    border: `1.5px solid ${formData.role === value ? 'var(--accent)' : 'var(--border-subtle)'}`,
+                    background: formData.role === value ? 'var(--bg-secondary)' : 'transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value={value}
+                    checked={formData.role === value}
+                    onChange={handleChange}
+                    style={{ display: 'none' }}
+                  />
+                  <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-main)' }}>{label}</span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{sub}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="reg-password">Password</label>
+              <input
+                id="reg-password"
+                name="password"
+                type="password"
+                className="input"
+                placeholder="Min. 8 characters"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                autoComplete="new-password"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="reg-confirm">Confirm Password</label>
+              <input
+                id="reg-confirm"
+                name="password_confirmation"
+                type="password"
+                className="input"
+                placeholder="Repeat password"
+                value={formData.password_confirmation}
+                onChange={handleChange}
+                required
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary btn-full"
+            disabled={loading}
+            style={{ marginTop: '0.5rem', padding: '0.875rem', fontSize: '1rem' }}
+          >
+            {loading ? (
+              <><Loader2 size={18} className="animate-spin" /> Creating account...</>
+            ) : (
+              'Create My Account'
+            )}
+          </button>
+        </form>
+
+        {/* Footer */}
+        <hr className="divider" style={{ margin: '1.75rem 0' }} />
+        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+          Already have an account?{' '}
+          <Link
+            to="/login"
+            style={{ color: 'var(--text-main)', fontWeight: 600, textDecoration: 'none' }}
+          >
+            Sign in
+          </Link>
+        </p>
+
       </div>
     </div>
   );

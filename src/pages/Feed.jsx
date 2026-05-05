@@ -30,38 +30,55 @@ export default function Feed() {
   }, [page]);
 
   return (
-    <div>
-      <div style={{marginBottom: '2rem'}}>
-        <h1 style={{fontSize: '2rem'}}>Explore Pixora</h1>
-        <p style={{color: 'var(--text-secondary)'}}>Discover the latest community uploads.</p>
+    <div className="animate-fade-in">
+      <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>
+            Curated Gallery
+          </span>
+        </div>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--text-main)', marginBottom: '1rem' }}>
+          Explore the World
+        </h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto' }}>
+          Discover breathtaking moments captured by our professional community.
+        </p>
       </div>
 
       {loading && page === 1 ? (
-        <div style={{display: 'flex', justifyContent: 'center', padding: '4rem'}}>
-          <Loader2 className="animate-spin" size={48} color="var(--accent-color)" />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', padding: '2rem 0' }}>
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="skeleton" style={{ width: 'calc(33.33% - 1.35rem)', height: '400px', borderRadius: '12px' }}></div>
+          ))}
         </div>
       ) : (
         <>
-          <div className="image-grid">
+          <div className="masonry-grid">
             {images.map(img => (
               <ImageCard key={img.id} image={img} />
             ))}
           </div>
           
           {images.length === 0 && (
-            <div className="glass-panel" style={{padding: '4rem', textAlign: 'center'}}>
-              <p style={{color: 'var(--text-secondary)'}}>No images found. Be the first to upload!</p>
+            <div style={{ padding: '6rem', textAlign: 'center', border: '1px dashed var(--border-subtle)', borderRadius: '24px' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>No stories discovered yet. Be the first to share one!</p>
             </div>
           )}
 
           {hasMore && (
-            <div style={{textAlign: 'center', margin: '2rem 0'}}>
+            <div style={{ textAlign: 'center', margin: '4rem 0' }}>
               <button 
                 onClick={() => setPage(p => p + 1)} 
-                className="glass-button"
+                className="btn btn-ghost"
                 disabled={loading}
+                style={{ padding: '12px 32px', borderRadius: '100px' }}
               >
-                {loading ? 'Loading...' : 'Load More'}
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={18} />
+                    <span>Discovering more...</span>
+                  </>
+                ) : 'Discover More'}
               </button>
             </div>
           )}
