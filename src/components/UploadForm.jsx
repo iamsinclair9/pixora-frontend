@@ -229,7 +229,7 @@ export default function UploadForm({ onUploadSuccess }) {
         {suggesting && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', padding: '6px 14px', borderRadius: '100px' }}>
             <Loader2 size={14} className="animate-spin" color="var(--star-gold)" />
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--star-gold)' }}>AI analysing…</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--star-gold)' }}>Analysing image…</span>
           </div>
         )}
         {!suggesting && aiStatus && (
